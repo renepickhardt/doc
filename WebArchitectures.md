@@ -36,9 +36,9 @@ Key Ideas:
 
 
 # References
-
+* [B. Erb -  Concurrent Programming for Scalable Web Architecturs (book, thesis)](http://berb.github.io/diploma-thesis/community/index.html)
+* [Theo Schlossnagle (OmniTI) - Scalable Internet Architecture](http://www.slideshare.net/postwait/scalable-internet-architecture)
 * [James Falkner - Asynchronous Web Programming with HTML5 WebSockets and Java](http://www.slideshare.net/schtool/asynchronous-web-programming-with-html5-websockets-and-java)
 * [Carl Henerson - Scalable Web Architectures: Common Patterns and Approaches (slides)](http://www.slideshare.net/iamcal/scalable-web-architectures-common-patterns-and-approaches-web-20-expo-nyc-presentation)
-* [B. Erb -  Concurrent Programming for Scalable Web Architecturs (book, thesis)](http://berb.github.io/diploma-thesis/community/index.html)
 * [Slides on Nodejs and ZMQ (slides)](http://www.slideshare.net/fedario/zero-mq-with-nodejs)
 
