@@ -80,24 +80,24 @@ automatically activated and configured on boot.
 
 ## Hostnames and SSH Config
 
-First adapt your `~/.ssh/config` to list both machines as `VLB1` and `VLB2`.
-Then cofigure the remote hostnames:
+First adapt your `~/.ssh/config` and `etc/hosts` to list both machines
+as `VLB1` and `VLB2`.  Then cofigure the remote hostnames:
 
     echo "VLB1" | ssh VLB1 "cat | sudo tee /etc/hostname"
     echo "127.0.0.1 VLB1" | ssh VLB1 "cat | sudo tee -a /etc/hosts"
 
+Similarly for VLB2.
+
 Remark: A drawback of this approach is that each time the 2nd command
 is executed a new line is appended at to /etc/hosts. In particular the
 command is not idempotent. An alternative variant would be to use
-`sed` for a global string replacement, which has similar
-issues. `sed s/VLB/VLB1/g` transforms `VLB -> VLB1 -> VLB11`.
+`sed` for a global string replacement, which has similar issues. `sed
+s/VLB/VLB1/g` transforms `VLB -> VLB1 -> VLB11`. Maybe `sed
+s/VLB$/VLB1/g` could work.
 
-Similarly for VLB2. Now restart the VMS 
-
-    ssh VLB1 'sudo init 6'
-    ssh VLB2 'sudo init 6'
-
-and log in to see the new hostnames are working as expected.
+Also it would be nice to set /etc/hosts correctly on the remote, but
+this gets too far. It seems [zookeper](http://zookeeper.apache.org/)
+is the right tool for this kind of problems.
 
 ## Network check
 
