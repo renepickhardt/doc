@@ -5,6 +5,7 @@ easy means to manage these service remotely. What I have in mind
 is something similar as tomcat's manager tool, that allows me
 to monitor and control different servlets installed.
 What I have instead of servlets are:
+
 * python scripts
 * java tasks
 * webservers
@@ -45,8 +46,56 @@ the taks on different instances.
 Seems to be the most promising tool. Developed at UBerkley. Free software.
 Scales to multiple nodes and multiple clusters. Oreilly has a book on it.
 
-It installs right away with `apt-get install ganglia-monitor ganglia-webfrontend`.
-To get the web-frontend running read the [mailinglist](https://www.mail-archive.com/ganglia-general@lists.sourceforge.net/msg06092.html).
+It installs right away with `apt-get install ganglia-monitor
+ganglia-webfrontend`.  To get the web-frontend running set an alias in
+the apache configuration as described in the [mailinglist](https://www.mail-archive.com/ganglia-general@lists.sourceforge.net/msg06092.html):
+
+    sudo cp /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-enabled/ganglia
+
+Architecture
+Ganglia consists of three different services `gmond`, `gmetad` and `gweb`.
+
+* `gmond`  
+  lightweight process that monitors system ressources and broadcast them on the local subnet.
+  Also it receives broadcast messages from the neihbouring nodes and makes them accessible for polling by `gmetad`.
+  It is important to note, that only the current state is rembered by the `gmond` instances and no historical data.
+* `gmetad`  
+  Service that aggregates status information from multiple
+  clusters. Per cluster it is sufficient to poll **one** `gmond`
+  instance, since the state is shared among the nodes.
+* `gweb`  
+   web dashboard for `gmetad` nodes.
+
+Architecture Scetch
+
+         gmond                gmetad      gweb
+         =====                ======      ====
+      * <-----> * <---[poll]---> * <-------> *
+      | Cluster |                |
+      * <-----> *                |
+                                 |
+      * <-----> * <---[poll]-----+
+      | Cluster |
+      * <-----> *
+
+Configuration of ganglia can be found in  `/etc/ganglia` in two well organized files.
+
+##### gmond
+
+* Gathers data from local system on an independent schedule.
+* Implication: System does not rely on external polling. Many
+  independent poller can queery the cluster. E.g. `gmond-zeromq`
+  publishes data on zmq bus.
+* gmond seems to run single threaded: (cf. `ps -eLf | grep gmond`)
+* Can be extended to report metrics provided by scripts in any
+  language. Especially easy: C, C++, Python. `gmetric` tool provided.
+* Metics are shared between gmond nodes via [multicast channels](http://en.wikipedia.org/wiki/IP_multicast)
+
+* Configuration in `/etc/ganglia/gmond.conf`
+  - Configure multicast channels
+  - Add customized metrics. (modified by `gmetric` tool)
+
+
 
 ### Log Aggregators
 Log Aggregators specialize on the task of getting log information from services running on different hosts storing
