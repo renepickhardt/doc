@@ -34,6 +34,8 @@ Key Ideas:
 * Web Server has only a proxy function
    * it distributes requests to the services
 
+## Event Driven Web Servers
+* http://stackoverflow.com/questions/6089091/why-use-mongrel2
 
 # References
 * [B. Erb -  Concurrent Programming for Scalable Web Architecturs (book, thesis)](http://berb.github.io/diploma-thesis/community/index.html)
