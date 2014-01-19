@@ -17,9 +17,8 @@ What is the right way to design an architecture meeting the following requiremen
 * Allow multiple scrapers. Further files may be downloaded from
   different sources or on different machines.
 
-<img src="img/zrw_overview.png" width="100%">
+![Overview](img/zrw_overview.png)
 
 ## All in one
 
-**Processes:**  
-* 
+<style type="text/css"> img[alt=Overview] { width: 100%; } </style>
