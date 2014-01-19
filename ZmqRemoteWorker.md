@@ -3,7 +3,8 @@
 We are am confronted with the following situation:
 
 * A scraper process is downloading files from a remote location. The
-  files are 1-10MB in size, and there are many of them (~500K).
+  files are 1-10MB in size, and there are many of them (~500K) growing
+  steadily (~100/day).
   
 * Each file shall pre processed by a worker process, which extracts
   some information (about 1K each) and passes them on to a collector
@@ -21,7 +22,8 @@ We search an architecture meeting the following requirements:
 
 <img src="img/zrw_overview.png" width="100%">
 
-We will use the [zmq messaging library](http://zeromq.org) for message passing and queing.
+We will use the [zmq messaging library](http://zeromq.org) for message
+passing and queing.
 
 ## Draft 1: All in one
 
@@ -158,3 +160,5 @@ stopped or crashes rather easily, since the downloaded files are
 available on a central location. When the storage becomes a problem it
 is possible to upgrade to Draft 3b, which uses a distributed file
 system.
+
+
