@@ -38,7 +38,7 @@ and comunicate directly with the collector process.
 * **Channels**
   - `[ScraperWorker|PUSH] -> [PULL|Output Collector]` -	output as string messages (line by line).
 
-#### Discussion
+### Discussion
 
 * Pros:
   - Simple architecture
@@ -79,7 +79,7 @@ allow dynamic allocation of workers and scrapers.
   * `[Proxy|PUSH] -> [PULL|Worker]` - pass downlaoded blop as binary message.
   * `[Worker|PUSH] -> [PULL|Collector]` - output as string messages.
 
-#### Discussion
+### Discussion
 * Pros:
   * Simple design
   * Separation of Concerns
@@ -105,22 +105,34 @@ abstracted from the components.
   * Small message size. Easy routing. Little overhead for proxy.
   * Centralized storage built in.
 * Cons:
-  * Storage node is single point of failiure.
+  * Storage node is bottleneck and single point of failiure
 
-# Draft 3b: Distributed storage
+## Draft 3b: Distributed storage
 
-Scraper store downloaded blops on a centralized storage node.
-The files will be cut into containers and distributed around
-all available nodes.
+Scraper store downloaded blops to a distributed file system. The files
+will be cut into containers and distributed around all available
+storage nodes. The storage nodes can be different from the nodes
+running the scrapers/workers but do not have to be.
 
 <img src="img/zrw_distributed_storage.png" width="100%">
 
 * Pros:
-  * Relieable storage
+  * Relieable storage with high write throughput.
 * Cons:
   * Additional network overhead for synchronization of files.
 
-# Draft 5: Scraper storage
+There is additional juice in this option as it allows to bring the
+computation to the storage. It should be possible to run the worker
+tasks processing the downloaded files on the node that runs the
+scraper. This would allow the scraper box to use its computing power
+for something sensible while waiting for the network.
+
+Since
+[HDFS](http://en.wikipedia.org/wiki/Apache_Hadoop#Hadoop_distributed_file_system)
+can be mounted to a folder, this solution can be interchanged with
+draft 3.
+
+## Draft 4: Scraper storage
 
 Scrapers store downloaded blops locally. The network locations
 (`$HOST:$PATH`) of the downloaded files are passed as messages. The
@@ -135,3 +147,14 @@ scraper's file system (e.g. via `ssh`)
 * Cons:
   * Makes scrapers inflexible. Need to be up and running while processing.
   * Bottleneck: scraper storage.
+
+
+## Final Discussion
+
+Currently I like the Draft 3 option best, since it is reasonably
+simple, while allowing parallelism and compying to the separation of
+concerns principle. It allows to resume work when the service is
+stopped or crashes rather easily, since the downloaded files are
+available on a central location. When the storage becomes a problem it
+is possible to upgrade to Draft 3b, which uses a distributed file
+system.
