@@ -38,7 +38,7 @@ and comunicate directly with the collector process.
 * **Channels**
   - `[ScraperWorker|PUSH] -> [PULL|Output Collector]` -	output as string messages (line by line).
 
-### Discussion
+#### Discussion
 
 * Pros:
   - Simple architecture
@@ -79,7 +79,7 @@ allow dynamic allocation of workers and scrapers.
   * `[Proxy|PUSH] -> [PULL|Worker]` - pass downlaoded blop as binary message.
   * `[Worker|PUSH] -> [PULL|Collector]` - output as string messages.
 
-### Discussion
+#### Discussion
 * Pros:
   * Simple design
   * Separation of Concerns
