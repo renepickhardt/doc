@@ -91,16 +91,47 @@ allow dynamic allocation of workers and scrapers.
 
 # Draft 3: Central storage
 
-Scraper store downloaded blops on a centralized storage node.
+Scraper store downloaded blops on a centralized storage node.  The
+central storage could be a file system location or a database.  The
+passed messages contain only paths to files on the storage node.
+
+The storage node could be mounted at the boxes running the scrapers
+and the workers, so that the details of the storage solutions are
+abstracted from the components.
 
 <img src="img/zrw_central_storage.png" width="100%">
 
-# Draft 4: Distributed storage
+* Pros:
+  * Small message size. Easy routing. Little overhead for proxy.
+  * Centralized storage built in.
+* Cons:
+  * Storage node is single point of failiure.
+
+# Draft 3b: Distributed storage
+
+Scraper store downloaded blops on a centralized storage node.
+The files will be cut into containers and distributed around
+all available nodes.
 
 <img src="img/zrw_distributed_storage.png" width="100%">
 
+* Pros:
+  * Relieable storage
+* Cons:
+  * Additional network overhead for synchronization of files.
+
 # Draft 5: Scraper storage
+
+Scrapers store downloaded blops locally. The network locations
+(`$HOST:$PATH`) of the downloaded files are passed as messages. The
+worker thread reads the contents of the file directly from the
+scraper's file system (e.g. via `ssh`)
 
 <img src="img/zrw_scraper_storage.png" width="100%">
 
-
+* Pros:
+  * Minimizes network overhead. No file transfer unless absolutely
+    necessary.
+* Cons:
+  * Makes scrapers inflexible. Need to be up and running while processing.
+  * Bottleneck: scraper storage.
