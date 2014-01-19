@@ -1,4 +1,4 @@
-# ZMQ Remote Worker
+# Remote Worker Architecture
 
 We are am confronted with the following situation:
 
