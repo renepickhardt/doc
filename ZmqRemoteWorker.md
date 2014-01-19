@@ -102,3 +102,4 @@ Scraper store downloaded blops on a centralized storage node.
 # Draft 5: Scraper storage
 
 <img src="img/zrw_scraper_storage.png" width="100%">
+
