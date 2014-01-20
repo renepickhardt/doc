@@ -55,7 +55,7 @@ on the host system:
 
 Make sure you have `pyzmq` and `simplejson` modules installed by running:
 
-    sudo apt-get install python-setuptools python-dev
+    sudo apt-get install python-setuptools python-dev libzmq-dev
     sudo easy_install pyzmq
     sudo easy_install simplejson
 
@@ -64,9 +64,9 @@ Make sure you have `pyzmq` and `simplejson` modules installed by running:
 We use the dpd-worker to run a first simple sleep task for us.
 First we create an appropriate configuration file:
 
-    cat << EOF | tee dpd-sleep-worker.json
-    {"pid_file": "/tmp/dpd-workerd-x.pid",
-     "log_file": "/tmp/dpd-workerd-x.log",
+    cat << EOF | tee dpd-sleep-workerd.json
+    {"pid_file": "/tmp/dpd-workerd.pid",
+     "log_file": "/tmp/dpd-workerd.log",
      "procs": [{
 	    "name": "sleep-worker-1",
 	    "run": "/bin/bash",
@@ -90,7 +90,7 @@ Remarks:
 
 Now start the worker using
 
-    sudo dpd-workerd -f -v dpd-sleep-worker.json
+    sudo dpd-workerd -f -v dpd-sleep-workerd.json
 
 The su-rights are needed, since `dod-wordkerd` spawns processes as
 different users. The `-f` command line switch tells dpd-workerd to run
@@ -115,7 +115,7 @@ tasks. For the beinging we stay on a single machine. To do so we
 create a config file:
 
     IP=127.0.0.1 # put your IP here
-    cat << EOF | tee dpd-master.json
+    cat << EOF | tee dpd-masterd.json
     {
         "pid_file": "/tmp/dpd-masterd.pid", 
         "log_file": "/tmp/dpd-masterd.log", 
@@ -139,7 +139,7 @@ create a config file:
 
 Start the master node using
 
-    dpd-masterd -f -v dpd-master.json
+    dpd-masterd -f -v dpd-masterd.json
 
 The master daemon does not require any special rights and can eveen be
 run as user `nobody`.
@@ -153,7 +153,7 @@ You should see the following output:
 
 The third line most likely referrers to the infamous
 ["slow-joiner" syndrom](http://zguide.zeromq.org/page:all#Getting-the-Message-Out).
-When you edit the `dpd-master.json` file the server automatically
+When you edit the `dpd-masterd.json` file the server automatically
 distributes the updated config.
 
 To see what actually happens we can subscribe to the zmq-PUB socket
@@ -185,7 +185,7 @@ configuration files.
         "master_stats": "tcp://$IP:31123",
         "master_updates": "tcp://$IP:31124",
         "node_name": "N1",
-        "conf_file": "/tmp/dpd-worker.json"
+        "conf_file": "/tmp/dpd-workerd.json"
     }
 	EOF
 
@@ -224,14 +224,14 @@ WARNING: `dpd-workerd` will not run with this config.
 ### Upshot
 
 The whole effect of the `dpd-masterd` and `dpd-clientd` scripts is to
-distribute parts of the `dpd-master.json` to the worker nodes and save
+distribute parts of the `dpd-masterd.json` to the worker nodes and save
 them in the `procs` section of `dpd-workerd.json` file:
 
 
-     * HOST:dpd-master.json
+     * HOST:dpd-masterd.json
        {
-	     'N1': [payload1],  -->  * N1:dpd-worker.json { procs: [payload1] }
-	     'N2': [payload2],  -->  * N2:dpd-worker.json { procs: [payload2] }
+	     'N1': [payload1],  -->  * N1:dpd-workerd.json { procs: [payload1] }
+	     'N2': [payload2],  -->  * N2:dpd-workerd.json { procs: [payload2] }
 		 ...
 	   ]
 
@@ -258,3 +258,8 @@ fileds from the master. We have to add them manually:
 	EOF
 
 Now start the daemon again and everything should be fine.
+
+# hOpen ends
+
+* Getting information out of diprocd: stdout, log files, stat socket
+* Distributing the system
