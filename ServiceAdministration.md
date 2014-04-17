@@ -60,11 +60,16 @@ them in a central repository (like mongo, hive, hdfs) and providing querry inter
 * [graphite](http://graphite.wikidot.com/) Log analytics.
 
 ### Application Manager
-* upstart - init script manager.
+* [upstart](http://upstart.ubuntu.com/) event-based replacement for the /sbin/init
+* [daemontools](http://cr.yp.to/daemontools.html) - a collection of tools for managing UNIX services.
+* [runit](http://smarden.org/runit/) - a UNIX init scheme with service supervision
+* [supervisord](http://supervisord.org/)  a client/server system that allows its users to monitor and control a number of processes on UNIX-like operating systems.
+
 * [pm2](https://github.com/Unitech/pm2) - nodejs process manager
 * [DiProcD](http://projects.ceondo.com/p/diprocd/) promisses much, seems immature
 * [Grunt.js](http://gruntjs.com/) Task Runner. Seems a perfect fit but js-only!
 * [job-runner](https://github.com/spilgames/job-runner) python tool for running jobs on remote servers. Uses zmq.
+
 
 
 #### Job Runner
