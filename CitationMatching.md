@@ -1,5 +1,15 @@
 # Ciation Matching - Literature Overview
 
+
+
+
+
+
+
+
+
+
+
 ## Systms
 
 * [CiteSeerX](http://citeseerx.ist.psu.edu/index)
@@ -96,7 +106,8 @@ Instances of more general problems in databases:
 
 The citation matching task can be further subdivided into:
 
-1. _Segmentation_, the deconstruction of reference strings into functional pieces such as 'author names', 'title', ect.
+1. _Segmentation_, the deconstruction of reference strings into
+   functional pieces such as 'author names', 'title', ect.
 2. _Entity resolution_, the clustering of records for the same document.
 
 But several authors depart from such a division.
@@ -118,22 +129,100 @@ Based on this dataset an inhouse citation matcher 'YADDA2' was
 evaluated. Some details and references about the implementation were
 given. However, I was not able to find the software on the net.
 
-## [Day, Tsai, et. al. - A knowlesdge-based approach to citation extraction]()
+## [Day, Tsai, et. al. - A knowlesdge-based approach to citation extraction](http://dns.csie.cyut.edu.tw/~shwu/publication/IRI2005.pdf)
 
-The paper is about extracting citations from documents not about the
-matching problem.
+The corresponing presentation is also available ([ppt](http://www.iis.sinica.edu.tw/~myday/slides/Slide2005_IEEE-IRI2005_A_Knowledge-based_Approach_to_Citation_Extraction.ppt))
+
+The paper propses a method for reference segmentation, that uses
+ontologies and the INFOMAP knowledge representation tool.
 
 Many interesing references are given.
+
+## [Pasula, et. al. - Identity Uncertainty in Citation Matching](http://www.cs.berkeley.edu/~milch/papers/nipsnewer.pdf)
+
+The paper deals with the problem of reference clustring.
+
+Example:
+Citeseer lists more than 100 distict AI textbooks by Russell and
+Norving from around 1995.
+
+Very nice related work section:
+
+* Record Linkage in databases
+  - Greedy (Fellinki and Sunter - A theory of record linkage, 1969)
+  - Global Probabilistic (Cohen et. al. - Hardening soft information sources 2000)
+* Data Association: e.g. in 3d spacial data
+* Reference Clustering ('ciation grouping')
+  - Lawrence, Giles - Autonomous citation matching (Citeseer), 1999
+  - McCallumn - Efficient clustering of high dimensional data, 2000
+
+New global method for reference clustering on the basis of "Relational
+Probabilistic Models". Complicated mathematics relying on prior theory
+by Koeller.
+
+Training Datasets:
+
+* 1990 Census Data on US Names
+* AI Bibliographic data (Bibtext) gathered by the authods
+* Hand selected 500 'citations' i.e. references
+
+Not clear: Is the task of reference segmentation also attacked? Yes?
+
+Evaluation on the citeseer dataset: Much better results.
+
+## [McCallum et. al. - Efficient Clustering of High-Dimensional Data Sets](http://www.kamalnigam.com/papers/canopy-kdd00.pdf)
+
+The paper considers the problem of clustering reference strings.
+The authors propse a two step process:
+
+1. Pre-cluster the data set into overlapping "Cannopies" using a cheap
+   approximate metric (Cos distance of tf-idf word vectors)
+2. Fine-grained clustering of the individual Cannopies using a
+   customized cost-adjusted, permutation-adjusted edit distance
+   between citations.
+
+The methods is evaluated on the 'cora set' and yields dramatic speed
+improvements when comared to the naive approach, while yielding
+neutral (slightly better) results.
+
+Uses Hidden Markov Models from Cora / Whizbang paper (McCallum,
+et. al. - Automating the construction of internet portals).
+
+## [Cohen et. al. - Hardening Soft Information Sources](courses.cs.washington.edu/courses/cse590q/04au/papers/Cohen00.pdf‎)
+
+The paper considers the problem of reference clustering.
+
+Basic idea is that reference data comprises a 'soft database' where
+the same entity might have many ids ('Bart Seleman' = 'B. Seleman'),
+but underlying there is a 'hard database' which unique ids, which was
+distorted by distorted in some sense.
+
+A formal process or hardening a database is introduced, which has
+the nice feature of being global, hence unique.
+
+The optimal hardening problem is shown to be NP-hard, and a greedy
+hardening algorithm is presented, which is nearly linear in time and
+converges to a local optimum.
+
+Key concept is an acyclic-interpretation relation: `I` which relates
+distinct references which are likely to be edits of one another `I:
+r_1 --> r_2` and assigns a cost to them. The formal hardening maps
+each reference to its initial interpretation.
 
 
 # Glossary
 
-* Reference. The textual reference inside an article to another
-article.
-  Typically these references are found in the section "References" in
-a paper.
-* Citaion. 'A citation is a performative act linking two entities,
+* *Reference* or *reference string*. The textual reference inside an
+  article to another article.  Typically these references are found in
+  the section "References" in a paper.
+* *Reference segmentation*. The deconstruction of reference strings
+   into functional pieces such as 'author names', 'title', ect.
+* *Reference clustering*. The process of grouping reference strings
+  that correspond to the same article.
+* *Citaion*. 'A citation is a performative act linking two entities,
   taking the simple form "EntityA cites EntityB"' c.f. [DS2013]
+
+
 
 # References
 

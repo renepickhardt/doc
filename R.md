@@ -9,6 +9,27 @@ cf. [blog](http://www.personal.psu.edu/mar36/blogs/the_ubuntu_r_blog/installing-
 Soon I decided to install the GUI [RStudio](http://www.rstudio.com/),
 whose installation was also unproblematic.
 
+Building from sources is also possible. First I used a
+[GitHub clone](https://github.com/wch/r-source) of the
+[SVN repository](https://svn.r-project.org/R), but the build failed
+due to a missing `.svn` dir. Very strange. However the following the
+[official docs](http://cran.r-project.org/doc/manuals/R-admin.html#Building-from-source)
+worked for me on Ubuntu 12.04:
+
+	# install dependencies
+	sudo apt-get install libx11-dev libxt-dev x11proto-core-dev
+
+	svn checkout https://svn.r-project.org/R/trunk/ r-source
+	cd r-source
+	
+	# download recommended packages
+	./tools/rsync-recommended 
+
+	./configure --enable-R-shlib # shlib is used by RStudio
+	make
+	make info
+	sudo make install
+
 ### First impression
 
 I am used to programming in python and java so I started with reading
@@ -111,10 +132,7 @@ objects?
 Ideally I would like to have some lower level, detail about
 implementations of objects. Howver, lets look at some examples first:
 
-* Costants
-
-  Constant Objects := "Objects that evaluate to themselves."
-	
+* Constants := "Objects that evaluate to themselves."
   This means a statement xxx represents an constant object iff
 
 		eval(quote(xxx)) == quote(xxx)
@@ -127,13 +145,35 @@ implementations of objects. Howver, lets look at some examples first:
     	eval(quote(-1)) == quote(-1)        # FALSE -> function call
 
   The statement `-1` represents the function call object `-(1)`.
+  Question: Can we turn the rule for constants into a function?
 
-Question: Can we turn the rule for constants into a function?
+    	isConst <- function(x) { eval(quote(x)) == quote(x) }
+	    isConst(3) # > [1] FALSE
 
-	isConst <- function(x) { eval(quote(x)) == x }
-	isConst(3) # > [1] FALSE
+  So the naive approach does not work. How can we debug this?
+  RStudio comes with a debugger. Setting a breakpoint inside the
+  function reveals that `x` is of type __promise__, which is
+  never constant. We have to look closer into function calls to
+  understand this behavior.
 
-So the naive approach does not work. How can we debug this?
+* Names := "Expressions that identify objects"
+
+  Statements expressing names have to pass the following regular expression:
+
+	    ^[.[:alpha:]][._[:alnum:]]*$
+  
+  Backticks allow arbitrary character strings to act as names:
+
+        class(quote(`<-`)) # [1] "name"
+
+  Using backticks it is also possible to expose the functional
+  internals of R, e.g.
+
+		`<-`(a, 3) # is identical to "a <- 3"
+		`if`(a == 3, "is three", "not three")  # > [1] "is three"
+
+* Promises. Internally used object type to implement lazy evaluation.
+  We have seen promises, when we were debugging a function.
 
 
 ### References
