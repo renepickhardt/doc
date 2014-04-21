@@ -1,8 +1,11 @@
+<!-- EMACS PREAMBLE: -->
+<!-- (global-set-key (kbd "C-c C-e") 'ess-eval-paragraph) -->
+
 # Digging into R
 
 Motivation: I was advised to use R for statistical analysis of time series data.
 
-### Installation
+## Installation
 
 Under Ubuntu Linux it was very simple to install R using `apt-get`
 cf. [blog](http://www.personal.psu.edu/mar36/blogs/the_ubuntu_r_blog/installing-r.html).
@@ -30,7 +33,7 @@ worked for me on Ubuntu 12.04:
 	make info
 	sudo make install
 
-### First impression
+## First impression
 
 I am used to programming in python and java so I started with reading
 [1]. The first thing to notice is that, the most important feature of
@@ -49,7 +52,7 @@ utterly wrong. This sentiment is shared e.g. by
 [D. Knuth](http://en.wikipedia.org/wiki/Donald_Knuth), who also uses
 `<-` in his books.
 
-A thing I found quiet amusing about R is that there seem to be equaly
+hekoA thing I found quiet amusing about R is that there seem to be equaly
 many articles describing flaws in the R language [2,3], than
 introductions and guides to the language. Of course I started reading
 flaws first.
@@ -96,7 +99,7 @@ No. Nested vectors are flattend out! Ok, next try, lets use a function:
 
 Good. Now lets map it to a vector:
 
-	sapply(-2:2, lenthOfArray)   # > [1] 3 2 1 2 3
+	sapply(-2:2, lengthOfArray)   # > [1] 3 2 1 2 3
 
 Ok. This is not as bad as I would had thought. At least the length
 function has a simple regularity:
@@ -107,7 +110,19 @@ One problem with the approach is that `sapply` stands for simplified
 apply, and performes some simplifications which might depend on the
 input data, and can lead to subtle bugs.
 
-### Under the hood
+As we have seen the sequence operator ':' is problematic to use
+in programs and loops. The recommended pattern in this case is using
+the `seq` function:
+
+	seq(length=5)    # > [1] 1 2 3 4 5
+	seq(length=0)    # > [1] integer(0)  i.e. length 0 sequence
+	seq(0,length=5)  # > [1] 0 1 2 3 4   i.e. good ol C/Java arrays
+
+Maybe an abreviation would be convenient:
+
+	iter <- function(n) seq(0,length=n)
+
+## Under the hood
 
 We are following [6, Chap. 13].
 
@@ -150,11 +165,11 @@ implementations of objects. Howver, lets look at some examples first:
     	isConst <- function(x) { eval(quote(x)) == quote(x) }
 	    isConst(3) # > [1] FALSE
 
-  So the naive approach does not work. How can we debug this?
-  RStudio comes with a debugger. Setting a breakpoint inside the
-  function reveals that `x` is of type __promise__, which is
-  never constant. We have to look closer into function calls to
-  understand this behavior.
+  So the naive approach does not work. How can we debug this?  RStudio
+  comes with a debugger. Setting a breakpoint inside the function
+  reveals that `x` is of type __promise__, which is never constant. We
+  have to look closer into function calls to understand this
+  behavior. 
 
 * Names := "Expressions that identify objects"
 
@@ -173,13 +188,244 @@ implementations of objects. Howver, lets look at some examples first:
 		`if`(a == 3, "is three", "not three")  # > [1] "is three"
 
 * Promises. Internally used object type to implement lazy evaluation.
-  We have seen promises, when we were debugging a function.
+  We have seen promises, when we were debugging a function. The
+  creation of promise objects is discuraged by the R API. Nevertheless,
+  the user can create promise objects using the `delayedAssign` function.
 
 
-### References
+		delayedAssign("x", 3)
+
+   RStudio, now shows a name "x" of type "promise" in its environment
+   view.  However, I could not find a way to print the class "promise"
+   on the scrren. All of `class(quote(z))`, `class(z)`, `typeof(z)`,
+   `typeof(quote(z))` show something else.
+
+   For further inormation see [7].
+
+* Function calls. This class covers everything else.
+
+# R Data Structrures
+
+## Working with vectors ##
+
+Let's generate a vector with some numbers in it:
+
+	x <- -3:3
+
+We can access individual parts of it via `x[i]` or to select ranges
+`x[c(1,2)]` or `x[3:5]`. We can filter `x` by boolean vectors:
+
+	x[c(F,T,F,T,F,T,F)]  # > [1] -2 0 2
+
+If the index vector is shorter than the length of `x` than the
+vector indexing vector is repeated as often as necessary:
+
+	(0:9)[c(T,F)]            # > [1] 0 2 4 6 8
+
+This is particularly powerful in combination with vectorized
+application of comparisons:
+
+	x > 0    # > [1] FALSE FALSE FALSE FALSE TRUE TRUE TRUE
+
+So that `x[x > 0]` selects the positive parts of the vector
+
+	x[x > 0] # > [1] 1 2 3.
+
+The following examples shows all values that are far away from the
+average:
+
+	y <- x*x
+	y[y - mean(y) > sd(y)]
+
+## Data Frames ##
+
+Data frame (`data.frame`) objects are essentially a list of vectors of the same
+length. It is the equivalent of a spreadsheet or database table in the
+R language. A predefined `data.frame` object is `mtcars`, containing information
+about a number of cars:
+
+	mtcars                    # shows a table view of the data.frame
+	class(mtcars)             # > [1] "data.frame"
+	colnames(mtcars)          # lists names of cloums
+	rownames(mtcars)          # list row names 
+	mtcars$mpg                # vector containing mpg values
+
+Data frames can be indexed like a matrix:
+
+	mtcars[1]                 # data.frame containing only first cloumn ('mpg')
+	mtcars[c('mpg','gear')]   # data.frame containing only two colums
+	mtcars['Valiant',]        # single row
+	mtcars[1:10,]             # slice of rows
+
+Let's create our own data frame:
+
+	df <- data.frame(x=1:3, y=c('a','b','c'), z=c(T,T,F))
+	with(df, x[z])            # load df into environment
+
+# Time Series Analysis with R #
+
+## Importing data ##
+
+Before we can start lets import some data. I have prepared
+some accelerometer data from my smartphone as tab separated values
+
+	x	y	z
+	-4.9433208	6.552774	5.5564456
+	-2.8357031	6.361172	6.935977
+	-2.9889846	6.591094	7.089258
+	-3.027305	6.246211	6.6677346
+	-3.2189064	6.361172	6.552774
+
+Now let us import this file into R, by running:
+
+	ACC <- read.csv(file="acc.tsv", header=TRUE, sep="\t")
+
+This gives us an __data.frame__ object `ACC` in the environment. Let's
+see what is in there: `plot(ACC)` give us a 3x3 matrix of plots.
+
+Data frame objects are essentially a list of vectors of the same length.
+
+	colnames(ACC) # > [1] "x" "y" "z"
+	
+We can access the individual colums by their names `ACC$x`.
+
+	library(lattice)
+	xyplot(x ~ y, data=ACC)
+
+The `with` statement allows us to treat the colums as usual variables
+in arbitrary expressions:
+
+	with(ACC, {
+		plot(c(0,length(x)), range(x,y,z) , type='n')  # no plotting
+		lines(x, col='green');
+		lines(y, col='blue');
+		lines(z, col='red')
+	})
+
+
+## Reading from a database ##
+
+We want to access more data stored on a local Postgres database.
+To do this we first install the [R-postgres package](https://code.google.com/p/rpostgresql/)
+
+	install.packages("RPostgreSQL")
+
+and connecto the the database
+
+	library(RPostgreSQL)
+	drv <- dbDriver("PostgreSQL")
+	con <- dbConnect(drv, host="localhost", port="5432",
+		             dbname="liveandgov", user="liveandgov", password="liveandgov"
+					 )
+	dbGetInfo(drv)  # no of db connections
+	summary(con)    # list basic info.
+
+Now lets query some data from the connection:
+
+	rs <- dbSendQuery(con,"SELECT * FROM sensor_accelerometer WHERE trip_id = 209")
+	first_row <- fetch(rs, n=1) 
+	class(first_row) # > [1] "data.frame"
+	ACC <- fetch(rs,n= -1)
+
+Let's write a convenience function to automate this process.
+
+	getACC <- function(id) {
+		rs <- dbSendQuery(
+		        con,
+	            paste("SELECT * FROM sensor_accelerometer WHERE trip_id = ",id)
+				)
+		fetch(rs, n=-1)
+	}
+	ACC <- getACC(863)
+
+How much data did we fetch?
+
+	dim(ACC)  # > [1] 6356 5
+	nrow(ACC) # > [1] 6356
+	ncol(ACC) # > [1] 5
+
+Lets do some subsampling before we plot the data:
+
+	SubACC <- ACC[c(T,F),]   # selects every second data point
+	dim(SubACC)              # > [1] 3178 5
+	with(SubACC, plot(x, type='l'))
+
+	# Random subsampling
+	SubACC <- ACC[sort(sample(nrow(ACC),50)),]
+	with(SubACC,plot(x, type='l'))
+
+Lets plot the first few data points:
+
+	with(ACC[1:500,], plot(x), type='l'))
+
+## Quality control
+
+How regular is our data sampled?
+
+	attach(ACC)   # load data.frame variables into environment
+	diff(ts)      # computes differences between time stamps
+ 
+We see a bunch of numbers most of them are -5, this means our time
+series runs actually backwards.  Moreover, we have several outliers
+with very big deviations going in both directions:
+
+	plot(diff(ts))
+
+While this problem can actually be resolved in our db query,
+lets solve it here as well.
+
+	ACC <- ACC[order(ACC$ts),]
+	attach(ACC)
+
+Furthermore, we see deviations from the expected value of 5:
+
+	hist(diff(ts)[diff(ts)>5])
+
+We see a few data points with 20 and a maximal deviation of 50, this
+is not too bad, but we should apply some interploation to make up for
+this.
+
+	approx(ts,x,n=(max(ts)-min(ts))/5)
+
+
+## Generating Features
+* Windowing
+* Mean, Sd, 
+* FFT
+
+## Basic operations on time series
+
+Lets prepare our data
+
+	s2 <- function(TS) TS$x^2 + TS$y^2 + TS$z^2
+	L <- sqrt(s2(ACC)) # length of ACC vector
+
+Differencing and integration are readily defined
+
+	diff(L)
+	int <- diffinv
+	diff(int(L)) - L
+
+Now lets convert the data into a time series object
+
+	TL <- ts(L,frequency=50)
+
+* diff, int
+* smoothing
+* ARMA models / forecasting
+
+
+
+
+# References
 1. [R programming for programmers](http://www.johndcook.com/R_language_for_programmers.html)
 2. [Design flaws in R](http://radfordneal.wordpress.com/2008/08/06/design-flaws-in-r-1-reversing-sequences/)
 3. Patrick Burns - The R Inferno
 4. [List of Ressources](http://www.ats.ucla.edu/stat/r/)
 5. [Online course for beginners.](http://tryr.codeschool.com/)
 6. John Chambers - Software for Data Analysis
+7. <http://adv-r.had.co.nz/Computing-on-the-language.html>
+8. [Little Book: R time series](http://a-little-book-of-r-for-time-series.readthedocs.org/en/latest/src/timeseries.html)
+9. <http://www.statmethods.net/advstats/timeseries.html>
+10. [Official docs](http://cran.r-project.org/doc/manuals/r-release/R-lang.html)
+11. [Plotting guide](https://www.harding.edu/fmccown/r/)
