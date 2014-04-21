@@ -362,43 +362,46 @@ Lets plot the first few data points:
 
 How regular is our data sampled?
 
-	attach(ACC)   # load data.frame variables into environment
-	diff(ts)      # computes differences between time stamps
+	diff(ACC$ts)      # computes differences between time stamps
  
 We see a bunch of numbers most of them are -5, this means our time
 series runs actually backwards.  Moreover, we have several outliers
 with very big deviations going in both directions:
 
-	plot(diff(ts))
+	plot(diff(ACC$ts))
 
 While this problem can actually be resolved in our db query,
 lets solve it here as well.
 
-	ACC <- ACC[order(ACC$ts),]
-	attach(ACC)
+	BCC <- ACC[order(ACC$ts),]
 
 Furthermore, we see deviations from the expected value of 5:
 
-	hist(diff(ts)[diff(ts)>5])
+	with(BCC,hist(diff(ts)[diff(ts)>5]))
 
 We see a few data points with 20 and a maximal deviation of 50, this
 is not too bad, but we should apply some interploation to make up for
-this.
+this:
 
-	approx(ts,x,n=(max(ts)-min(ts))/5)
+	sample_count <- (max(BCC$ts) - min(BCC$ts))/5
+	interp <- function(v) approx(BCC$ts,v,n=sample_count)$y
 
-
+	CCC <- data.frame(ts=1:sample_count)
+	CCC$x <- interp(BCC$x)
+	CCC$y <- interp(BCC$y)
+	CCC$z <- interp(BCC$z)
+	
 ## Generating Features
 * Windowing
 * Mean, Sd, 
 * FFT
 
-## Basic operations on time series
+## Series operations
 
 Lets prepare our data
 
-	s2 <- function(TS) TS$x^2 + TS$y^2 + TS$z^2
-	L <- sqrt(s2(ACC)) # length of ACC vector
+	s2 <- function(DF) with(DF, sqrt(x^2 + y^2 + z^2))
+	L <- s2(CCC) # length of ACC vector
 
 Differencing and integration are readily defined
 
@@ -406,15 +409,35 @@ Differencing and integration are readily defined
 	int <- diffinv
 	diff(int(L)) - L
 
+Application of linear filters is easy as well:
+
+	plot_filter <- function(L,weights) {
+		plot(
+			cbind(L,filter(L,weights)),
+		    plot.type='single',
+			col=c('black','red'))
+	}
+
+	norm <- function(a) {a / sum(a)}
+
+    # smooth signal with average of 100 values
+	plot_filter(L[1:1000],norm(rep(1,100))) 
+
+    # smooth signal with average of 100 values
+	plot_filter(L[1:1000],norm(dnorm(seq(-2,2,0.1)))) 
+		
+
+## Time Series Objects
+
 Now lets convert the data into a time series object
 
-	TL <- ts(L,frequency=50)
+	M <- with(CCC, cbind(x,y,z,L)) # matrix representation of CCC
+	TL <- ts(M,frequency=50)
 
-* diff, int
-* smoothing
-* ARMA models / forecasting
+	plot(TL, plot.type='single', col=c('blue','green','red','grey'))
 
-
+To 
+	acf(TL[,"L"],1000)
 
 
 # References
