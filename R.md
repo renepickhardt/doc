@@ -52,7 +52,7 @@ utterly wrong. This sentiment is shared e.g. by
 [D. Knuth](http://en.wikipedia.org/wiki/Donald_Knuth), who also uses
 `<-` in his books.
 
-hekoA thing I found quiet amusing about R is that there seem to be equaly
+A thing I found quiet amusing about R is that there seem to be equaly
 many articles describing flaws in the R language [2,3], than
 introductions and guides to the language. Of course I started reading
 flaws first.
@@ -425,20 +425,29 @@ Application of linear filters is easy as well:
 
     # smooth signal with average of 100 values
 	plot_filter(L[1:1000],norm(dnorm(seq(-2,2,0.1)))) 
-		
+
+Now lets compute the auto correlation to detect regularities
+
+	ACF <- acf(L,3000)
+
+	# find local maxima by chcking sing changes of the first derivative
+	lmax <- which(diff(sign(diff(ACF$acf)))==-2)
+	# > 253  502  752  868  884 1001 
 
 ## Time Series Objects
 
-Now lets convert the data into a time series object
+Now lets convert the data into a multivariate time series object
 
 	M <- with(CCC, cbind(x,y,z,L)) # matrix representation of CCC
-	TL <- ts(M,frequency=50)
+	TL <- ts(M,frequency=50) 
 
 	plot(TL, plot.type='single', col=c('blue','green','red','grey'))
 
-To 
-	acf(TL[,"L"],1000)
+Now lets do a seasonal decomposistion of the time series
 
+	plot(stl(ts(L,frequency=253), s.window=1, t.window=100))
+
+	plot(stl(TL[,"L"], s.window=10, t.window=100))
 
 # References
 1. [R programming for programmers](http://www.johndcook.com/R_language_for_programmers.html)
