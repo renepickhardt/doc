@@ -1,0 +1,261 @@
+% Created 2014-04-25 Fri 18:06
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\author{Heinrich Hartmann}
+\date{\today}
+\title{A mathematical theory of Language}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+
+\newcommand{\DEF}[1]{{\it #1}} % Definitions
+\newcommand{\EQUIV}{\Leftrightarrow} % Equivalence
+
+\newcommand{\IN}{{\mathbb N}}
+\newcommand{\IR}{{\mathbb R}}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\lra}{\longrightarrow}
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+ 
+\section{Preliminaries}
+\subsection{Spaces of Sequences}
+\label{sec-1-1}
+
+\newcommand{\SEQ}{\Sigma}
+\newcommand{\len}{\text{\it length}}
+
+Let A be a finite set. In Examples, this will be the set of characters
+or the set of words. We define the set of Sequences over $A$ as 
+\[ \SEQ A = \{ (a_0,\dots,a_l) \,|\, a_i \in A, l \geq 0 \}. \] 
+We introduce the following notation:
+\begin{itemize}
+\item The empty seuqence is denoted by $() \in \SEQ A$.
+\item The length function is denoted by
+  \[ \len: \SEQ A \lra \IN_0,\quad (a_1,\dots,a_l) \mapsto l. \]
+\item We have the following canonical decomposition by sequence length
+\[ \SEQ A = A^0 \union A^1 \union A^2 \dots \]
+and denote by $i_N: A^N \ra \SEQ A$ the inclusion of the length-$i$ sequences into $\SEQ A$.
+
+\end{itemize}
+
+\newcommand{\pr}[1]{{\pi_{#1}}}
+\newcommand{\PR}[2]{{\pi_{#1}^{#2}}}
+\newcommand{\undef}{\langle \mathrm{undef} \rangle}
+%\newcommand{\undef}{\diamond}
+
+Furthermore for each index $i \geq 0$ we have a projection
+\[ \pr{i}: \SEQ A \lra A_+, \quad (a_1, \dots, a_l) \mapsto 
+\begin{cases}
+  a_i & l \geq i  \\
+  \undef & l < i
+\end{cases}
+. \]
+Here $A_+ := A \union \{ \undef \}$. This space allows
+$\pr{i}$ to be defined on whole of $\SEQ A$.
+
+Furthermore if $N \geq 0$ and $i \geq 1$ are given, we define the $i$-th $N$-gram
+projection to be:
+\[ \PR{i}{N}: \SEQ A \lra A^N_+, \quad (a_1, \dots, a_l) \mapsto
+\begin{cases}
+(a_{i+0},\dots,a_{i+N-1})  & l \geq i+N-1  \\
+\undef                   & l < i+N-1
+\end{cases}.\]
+
+Note that we get back $\pr{i}$ as $\PR{i}{1}$. Moreover $\PR{i}{0}$ is the
+canonical projection of $\SEQ A$ to the one point space $A^0 \subset
+A^0_+$.
+
+We have the following two filtrations of $\SEQ A$
+\[ A^0 = \SEQ^{\leq 0} A \subset \SEQ^{\leq 1} A \subset \SEQ^{\leq
+  2} A \subset \dots \subset \SEQ A \]
+and 
+\[ \SEQ A = \SEQ_{\geq 0} A \supset \SEQ_{\geq 1} A \supset \SEQ_{\geq
+  2} A \supset \dots \supset \bigcap \SEQ_{\geq i} A = \emptyset  \]
+
+\subsection{Spaces of probability measures}
+\label{sec-1-2}
+
+\newcommand{\MES}{\mathcal{M}}  % Space of measures
+\newcommand{\PROB}{\mathcal{P}}  % Space of probability measures
+\newcommand{\EXP}[2]{E_{#1}[#2]} % Expectation of a random variable
+
+Let $X$ be an at most countable\footnote{The assumption of
+  countability could be dropped, at the expense of a slightly more
+  technical treatment of infinite sums.} set. We denote by
+\[ 
+   \MES(X) = \{ \mu: X \lra \IR_{\geq 0} \,|\, \sum_{x \in X} \mu(x) <
+\infty \}
+\]
+the space of all finite measures on $X$. For $A \subset X$ we write
+$\mu[A] = \sum_{x \in A} \mu(x)$. This definition agrees with the
+usual definition, of measures in the case of discrete spaces with
+maximal $\sigma$-algebara.
+
+The set of probability measures is defined as
+\[ \PROB(X) = \{ \mu  \,|\,  \mu[X] = 1 \} \subset \MES(X). \]
+We get a normailzation map,
+\[ \MES (X) \setminus \{0\} \lra \PROB (X), \quad \mu \mapsto
+\frac{1}{\mu[X]} \mu \]
+which is defined for non-zero measures $\mu$.
+
+Let $f:X \lra Y$ be a map of sets, then we get a natural map
+\[ f_*: \MES(X) \lra \MES(Y), \quad
+   f_*(\mu)(y) = \mu[ f^{-1}(\{y\})] = \sum_{x:f(x)=y} \mu(x) \]
+as well as $f_*: \PROB(X) \ra \PROB(Y)$.
+
+If $f$ has finite fibers, then we also have the following map:
+\[ f^*: \MES(Y) \lra \MES(X), \quad \mu \mapsto \mu \circ f, \]
+however the total volume of $Y$ is not preserved, so that no map on
+$\PROB$ is induced. In particular case, that $\iota: A \subset X$ is
+the inclusion of a subspace we write $\mu|_A$ for $\iota^*(\mu)$.  If
+for $P\in \PROB(X)$ the restriction $P|_{A}$ is not necessary a
+probability measure. If $P[A] \neq 0$, then $P|_A$ can be normalized
+to \[ P[\_|A]=\frac{1}{P[A]}P|_A,\] the conditional probability
+measure on $A$.
+
+If $\mu \in \MES_f(X)$ and $f:X \ra \IR$, we define the \DEF{expectation}
+of $f$ as:
+\[ \EXP{\mu}{f} :=  \sum_{x \in X} f(x) \mu(x). \]
+This sum is well defined since $\mu$ is  finitely supported.
+
+\subsection{Probability measures on sequences}
+
+
+In this section we study the relationship between $\PROB(A)$ and
+$\PROB(\SEQ A)$.
+
+For $i \geq 1$ and $N \geq 0$ we have the following maps:
+\[ \pr{i}_*: \PROB(\SEQ A) \lra \PROB(A_+), \quad \PR{i}{N}_*: \PROB(\SEQ A) \lra \PROB(A^N_+), \]
+as well as
+\[ \len_*: \PROB(\SEQ A) \lra \PROB(\IN_0). \]
+
+\subsubsection{Unigram measures}
+
+Hence, for each probability measure $P$ on $\SEQ A$, we have
+$\pr{i}_* P$ which is a measure on $A_+$. Note that
+\[ \pr{i}_* P (\undef) = P[\{s \,|\, \len(s) < i \}] = P[\len < i]. \]
+In the case, that $\pr{i}_* P (\undef) \neq 1$ we can normailze
+$\pr{i}_* P$ to the $i$-th element distribution
+\[ D_i P = \frac{1}{P[\len \geq i]} \, \pr{i}_* P = \pr{i}_*P[\_|\len
+\geq i]  \;\in\; \PROB(A)\]
+on $A$.
+
+To define a total distribution of all elements, we want to take the
+following infinite sum of $i$-th element distributions
+\[ \sum_{i \geq 1} \pr{i}_* P \]
+However, this sum is not necessarily finite for a general measure $P
+\in \PROB(A)$, therefore we make the additional assumption that $P$
+is finitely supported and define
+\[ M^1 : \MES_f(\SEQ A) \lra \MES(A), \quad \mu \mapsto 
+         \sum_{i \geq 1} \pr{i}_* \mu. \]
+Note that the measure is only defined on $A \subset A_+$, since
+we have
+\[ \sum_{i \geq 1} \pr{i}_*(\undef) = \sum_{i \geq 1} P[\len < i] =
+\infty. \]
+We calculate the total volume to be
+\[ M^1 \mu(A) = \sum_{i \geq 1} \mu[\len \geq i] = \EXP{\mu}{\len}. \]
+Hence, for $P \in \PROB_f(\SEQ)$ with $P[\len = 0] \neq 1$, we can
+normalize the measure $M^1P$, and define \DEF{unigram distribution} on
+$A$ as
+\[ D^1 P := \frac{1}{\EXP{P}{\len}} \sum_{i \geq 1} \pr{i}_* P \;\in\;
+\PROB(A). \]
+
+\subsubsection{$N$-gram measures}
+
+More generally, for integers $i \geq 1$ and $N \geq 0$ we get a
+measure $\PR{i}{N}_*(P)$ on $A^N_+$, for which
+\[ \PR{i}{N}_* P (\undef) =  P[\len < i + N -1]. \]
+If this number is not equal to one, we define the $i$-th $N$-gram
+distribution to be
+\[ D_i^N P = \frac{1}{P[\len \geq i+N-1]} \, 
+             \PR{i}{N}_* P \;\in\; \PROB(A^N) \]
+For the global $N$-gram distributions we take
+\[ M^N: \MES_f(\SEQ A) \lra \MES(A^N), \quad \mu \mapsto \sum_{i
+\geq 1} \PR{i}{N}_* \mu. \]
+Again, this measure is only defined on $A^N \subset A^N_+$.
+We calculate the total volume as
+\begin{align} 
+  M^N(\mu)(A^N) &= \sum_{i \geq 1} \mu[\len \geq i + (N-1)] \\
+                &= \sum_{j = N} (j-(N-1)) \mu[\len = j]    \\
+                &= \EXP{\mu}{\max\{ 0, \len - (N-1) \} }  
+\end{align}
+Note that this number depends only on the length distribution
+$\len_*(\mu) \in \MES_f(\IN_0)$ and is non-zero if and only if
+$\mu[\len \geq N] \neq 0$. 
+
+Hence, for $P \in \PROB_f(\SEQ A)$, with $P[\len \geq N] > 0$ we can define the
+{\it total N-gram distribution} as
+\[ D^N P = \frac{1}{\EXP{}{\max\{ 0, \len - (N-1) \} }}
+           \sum_{i \geq 1} \PR{i}{N}_* P \;\in\; \PROB(A^N). \]
+Note, that the special case of $N=1$ reduces to our earlier definition.
+
+\subsection{Markov measures}
+
+A probability measure $P$ on $\SEQ A$ is called $K$-Markov if
+for all $l \geq K$, $b_0,\dots,b_l \in A$ and $n > l$ the condition
+\begin{align*}
+  &  P[ \pr{n} = b_0 \,|\, \pr{n-1} = b_1, \dots, \pr{n-K} = b_K, \dots, \pr{n-l} = b_l ] \\  
+ \;=\;&  P[ \pr{n} = b_0 \,|\, \pr{n-1} = b_1, \dots, \pr{n-K} = b_K ]
+\end{align*}
+holds whenever both sides are well-defined, i.e.
+$P[\pr{n-1} = b_1,\dots, \pr{n-l} = b_l ]$ is non-zero.
+
+\subsubsection{The case of $\undef$}
+The above definition, does not specify a
+condition in the case one ore more of the $b_i$ are $\undef$.
+For $b_0=\undef$ is unproblematic. In the case that $b_0 \in A$ and $b_j =
+\undef$ for one $j > 0$, the condition is empty since $\pr{i-j} =
+\undef$ implies $\pr{i}=\undef$. For the remaining case 
+of $b_0 = \undef$ and $b_j = \undef$ for one or more $j > 0$,
+the naive-condition does not extend. To see this, we take $K=0$ and
+$l=1$ with $b_1 = \undef$, so that the extended condition reads
+\begin{align}
+P[\pr{n} = \undef \,|\, \pr{n-1} = \undef ] = P[\pr{n} = \undef ].
+\end{align}
+This implies $P[\pr{n-1} = \undef] = 1$, which does not always hold.
+
+\subsubsection{0-Markov measures}
+In the special case of $K=0$ we find
+\begin{align*}
+  P[\pr{n} = b_0 ] &= P[ \pr{n} = b_0 \,|\, \pr{n-1} = b_1] \\
+  \EQUIV \quad P[ \pr{n} = b_0,  \pr{n-1} = b_1 ] 
+                   &= P[ \pr{n} = b_0 ] P[\pr{n-1} = b_1 ]
+\end{align*}
+which is the definition of $P$-independent between $\pr{n}$ and
+$\pr{n-1}$ random variables, except that the case $\undef$ is
+excluded. We can account for that by using conditional probabilities.
+Assume that $P[\len \geq n] > 0$ then, $\pr{n}, \pr{n-1}$ are
+$P[\_|\len \geq n]$ independent random variables on $\SEQ_{\geq n} A$.
+
+Similarly, we see that the full collection $\{ \pr{i} \}_{i \leq n}$ 
+is $P[\_|\len \geq n]$-independent on $\SEQ_{\geq n} A$. Indeed, 
+\[     P[ \pr{0} = a_0, \dots, \pr{n} = a_n | \len \geq n]
+  = \frac{1}{P[\len \geq n]} P[ \pr{0} = a_0, \dots, \pr{n} = a_n ] \]
+and
+\begin{align*}
+ P[ \pr{0} = a_0, \dots, \pr{n} = a_n] = &P[ \pr{0} = a_0, \dots, \pr{n} = a_n ] \\
+  = & P[ \pr{n} = a_n     | \pr{n-1}=a_{n-1}, \dots, \pr{0} = a_0 ]  \\
+    & P[\pr{n-1} = a_{n-1}| \pr{n-2}=a_{n-1}, \dots, \pr{0} = a_0 ]  \\
+    & \dots \\
+    & P[\pr{0} = a_{0}]
+\end{align*}
+
+\end{document}
