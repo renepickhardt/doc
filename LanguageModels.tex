@@ -44,10 +44,10 @@
 
 Let A be a finite set. In Examples, this will be the set of characters
 or the set of words. We define the set of Sequences over $A$ as 
-\[ \SEQ A = \{ (a_0,\dots,a_l) \,|\, a_i \in A, l \geq 0 \}. \] 
+\[ \SEQ A = \{ (a_1,\dots,a_l) \,|\, a_i \in A, l \geq 0 \}. \] 
 We introduce the following notation:
 \begin{itemize}
-\item The empty seuqence is denoted by $() \in \SEQ A$.
+\item The empty seuqence is denoted by $\epsilon \in \SEQ A$.
 \item The length function is denoted by
   \[ \len: \SEQ A \lra \IN_0,\quad (a_1,\dots,a_l) \mapsto l. \]
 \item We have the following canonical decomposition by sequence length
@@ -89,6 +89,10 @@ We have the following two filtrations of $\SEQ A$
 and 
 \[ \SEQ A = \SEQ_{\geq 0} A \supset \SEQ_{\geq 1} A \supset \SEQ_{\geq
   2} A \supset \dots \supset \bigcap \SEQ_{\geq i} A = \emptyset  \]
+where 
+\[ \SEQ^{\leq i} A = A^{0} \union \dots A^{i} \]
+and
+\[ \SEQ_{\geq i} A = A^{i} \union A^{i + 1} \union \dots \]
 
 \subsection{Spaces of probability measures}
 \label{sec-1-2}
@@ -131,9 +135,9 @@ probability measure. If $P[A] \neq 0$, then $P|_A$ can be normalized
 to \[ P[\_|A]=\frac{1}{P[A]}P|_A,\] the conditional probability
 measure on $A$.
 
-If $\mu \in \MES_f(X)$ and $f:X \ra \IR$, we define the \DEF{expectation}
-of $f$ as:
-\[ \EXP{\mu}{f} :=  \sum_{x \in X} f(x) \mu(x). \]
+If $\mu \in \MES_f(X)$ and $g:X \ra \IR$, we define the \DEF{expectation}
+of $g$ as:
+\[ \EXP{\mu}{f} :=  \sum_{x \in X} g(x) \mu(x). \]
 This sum is well defined since $\mu$ is  finitely supported.
 
 \subsection{Probability measures on sequences}
@@ -162,7 +166,7 @@ To define a total distribution of all elements, we want to take the
 following infinite sum of $i$-th element distributions
 \[ \sum_{i \geq 1} \pr{i}_* P \]
 However, this sum is not necessarily finite for a general measure $P
-\in \PROB(A)$, therefore we make the additional assumption that $P$
+\in \PROB(\SEQ A)$, therefore we make the additional assumption that $P$
 is finitely supported and define
 \[ M^1 : \MES_f(\SEQ A) \lra \MES(A), \quad \mu \mapsto 
          \sum_{i \geq 1} \pr{i}_* \mu. \]
@@ -172,7 +176,7 @@ we have
 \infty. \]
 We calculate the total volume to be
 \[ M^1 \mu(A) = \sum_{i \geq 1} \mu[\len \geq i] = \EXP{\mu}{\len}. \]
-Hence, for $P \in \PROB_f(\SEQ)$ with $P[\len = 0] \neq 1$, we can
+Hence, for $P \in \PROB_f(\SEQ A)$ with $P[\len = 0] \neq 1$, we can
 normalize the measure $M^1P$, and define \DEF{unigram distribution} on
 $A$ as
 \[ D^1 P := \frac{1}{\EXP{P}{\len}} \sum_{i \geq 1} \pr{i}_* P \;\in\;
