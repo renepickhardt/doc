@@ -16,7 +16,7 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \tolerance=1000
-\author{Heinrich Hartmann}
+\author{Heinrich Hartmann, Rene Pickhardt}
 \date{\today}
 \title{A mathematical theory of Language}
 \begin{document}
@@ -142,7 +142,6 @@ This sum is well defined since $\mu$ is  finitely supported.
 
 \subsection{Probability measures on sequences}
 
-
 In this section we study the relationship between $\PROB(A)$ and
 $\PROB(\SEQ A)$.
 
@@ -151,7 +150,7 @@ For $i \geq 1$ and $N \geq 0$ we have the following maps:
 as well as
 \[ \len_*: \PROB(\SEQ A) \lra \PROB(\IN_0). \]
 
-\subsubsection{Unigram measures}
+\subsubsection{from Language Models to unigram measures}
 
 Hence, for each probability measure $P$ on $\SEQ A$, we have
 $\pr{i}_* P$ which is a measure on $A_+$. Note that
@@ -181,6 +180,40 @@ normalize the measure $M^1P$, and define \DEF{unigram distribution} on
 $A$ as
 \[ D^1 P := \frac{1}{\EXP{P}{\len}} \sum_{i \geq 1} \pr{i}_* P \;\in\;
 \PROB(A). \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{From unigram measures to Language Models}
+Let $P \in \PROB(A)$ be a probability measure. 
+$\forall l \in \IN$ we can pull back $P$ via $\pi_i$ to $P(A^l)$ and define
+\[B^lP = \prod_{i=1}^l \pi_i^* P = \prod_{i=1}^l P \circ \pi_i \]
+Explicitly for $s = (a_1,\dots,a_l) \in A^l$ this means $P(s)=\prod_{i=1}^l P(\pi_i(s))$.
+Note that in these cases $\pi_i(s) \in A$ is well defined.
+
+In the case of $l=1$ it is trivial to see that we receive a probability measure.
+For $l=2$ we have:
+\[\sum_{s\in A^2}B^2P = \sum_{s\in A^2} \prod_{i=1}^2 P(\pi_i(s)) = \sum_{a_1,a_2} P(a_1)P(a_2) = \sum_{a_1} P(a_1) \sum_{a_2} P(a_2) = \sum_{a_1} P(a_1) = 1\]
+A similar argument will hold for all $l \in \IN$ showing that the pulled back probability measure $B^lP$ is indeed a probability measure on $A^l$. 
+
+In order to construct a measure in $\PROB(\SEQ(A))$ starting from $P\in \PROB(A)$ we have a lot of choice (indicating that $\PROB(\SEQ(A))$ is indeed bigger than $\PROB(A)$).
+Note that simply adding up $B^lP$ by setting 
+\[B_{naiveTry}P = \sum_{l\geq 1}B^1P\] 
+will not work as 
+\[\sum_{s\in \SEQ A}B_{naiveTry}P(s) = \infty \neq 1\]
+We can simply fix this by weighting the sum with an arbitrary chosen probability distribution $P_{weight}\in \PROB(\IN)$.
+So we receive a Langugage Model from a Unigram Model by setting:
+\[BP = \sum_{l\geq 1}  P_{weight}(l)B^1P = \sum_{l\geq 1} P_{weight}(l)\prod_{i=1}^l P \circ \pi_i \]
+
+When applying statistics one could estimate the length distribution on sentences as a weighting distribution.
+\textbf{We think one should investigate smoothing techniques for language models by changing this choice}
+Another open end which I did not include yet is the idea of pushing forward $B^lP$ via $i_N:A^N \lra \SEQ(A)$. Well I think I did this implicetly by not being totally clean when using $\pi_i$ of stating if it was defined on $\SEQ A$ or $A^l$.
+\textbf{is it possible to show that the above mentioned choice is up to a probability measure from $\PROB(\IN)$?}
+
+%Before proofing that these maps are probability measures we will use the more formal notation from above to formulate the statement. 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{$N$-gram measures}
 
