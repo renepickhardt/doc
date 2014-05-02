@@ -186,27 +186,27 @@ $A$ as
 \subsubsection{From unigram measures to Language Models}
 Let $P \in \PROB(A)$ be a probability measure. 
 $\forall l \in \IN$ we can pull back $P$ via $\pi_i$ to $P(A^l)$ and define
-\[B^lP = \prod_{i=1}^l \pi_i^* P = \prod_{i=1}^l P \circ \pi_i \]
+\[B_l^1P = \prod_{i=1}^l \pi_i^* P = \prod_{i=1}^l P \circ \pi_i \]
 Explicitly for $s = (a_1,\dots,a_l) \in A^l$ this means $P(s)=\prod_{i=1}^l P(\pi_i(s))$.
 Note that in these cases $\pi_i(s) \in A$ is well defined.
 
 In the case of $l=1$ it is trivial to see that we receive a probability measure.
 For $l=2$ we have:
-\[\sum_{s\in A^2}B^2P = \sum_{s\in A^2} \prod_{i=1}^2 P(\pi_i(s)) = \sum_{a_1,a_2} P(a_1)P(a_2) = \sum_{a_1} P(a_1) \sum_{a_2} P(a_2) = \sum_{a_1} P(a_1) = 1\]
-A similar argument will hold for all $l \in \IN$ showing that the pulled back probability measure $B^lP$ is indeed a probability measure on $A^l$. 
+\[\sum_{s\in A^2}B^1_2P = \sum_{s\in A^2} \prod_{i=1}^2 P(\pi_i(s)) = \sum_{a_1,a_2} P(a_1)P(a_2) = \sum_{a_1} P(a_1) \sum_{a_2} P(a_2) = \sum_{a_1} P(a_1) = 1\]
+A similar argument will hold for all $l \in \IN$ showing that the pulled back probability measure $B_l^1P$ is indeed a probability measure on $A^l$. 
 
 In order to construct a measure in $\PROB(\SEQ(A))$ starting from $P\in \PROB(A)$ we have a lot of choice (indicating that $\PROB(\SEQ(A))$ is indeed bigger than $\PROB(A)$).
-Note that simply adding up $B^lP$ by setting 
-\[B_{naiveTry}P = \sum_{l\geq 1}B^1P\] 
+Note that simply adding up $B_l^1P$ by setting 
+\[B_{naiveTry}P = \sum_{l\geq 1}B^1_lP\] 
 will not work as 
 \[\sum_{s\in \SEQ A}B_{naiveTry}P(s) = \infty \neq 1\]
 We can simply fix this by weighting the sum with an arbitrary chosen probability distribution $P_{weight}\in \PROB(\IN)$.
 So we receive a Langugage Model from a Unigram Model by setting:
-\[BP = \sum_{l\geq 1}  P_{weight}(l)B^1P = \sum_{l\geq 1} P_{weight}(l)\prod_{i=1}^l P \circ \pi_i \]
+\[B^1P = \sum_{l\geq 1}  P_{weight}(l)B^1_lP = \sum_{l\geq 1} P_{weight}(l)\prod_{i=1}^l P \circ \pi_i \]
 
 When applying statistics one could estimate the length distribution on sentences as a weighting distribution.
 \textbf{We think one should investigate smoothing techniques for language models by changing this choice}
-Another open end which I did not include yet is the idea of pushing forward $B^lP$ via $i_N:A^N \lra \SEQ(A)$. Well I think I did this implicetly by not being totally clean when using $\pi_i$ of stating if it was defined on $\SEQ A$ or $A^l$.
+Another open end which I did not include yet is the idea of pushing forward $B^1_lP$ via $i_N:A^N \lra \SEQ(A)$. Well I think I did this implicetly by not being totally clean when using $\pi_i$ of stating if it was defined on $\SEQ A$ or $A^l$.
 \textbf{is it possible to show that the above mentioned choice is up to a probability measure from $\PROB(\IN)$?}
 
 %Before proofing that these maps are probability measures we will use the more formal notation from above to formulate the statement. 
@@ -215,7 +215,7 @@ Another open end which I did not include yet is the idea of pushing forward $B^l
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsubsection{$N$-gram measures}
+\subsubsection{From Language Models to $N$-gram measures}
 
 More generally, for integers $i \geq 1$ and $N \geq 0$ we get a
 measure $\PR{i}{N}_*(P)$ on $A^N_+$, for which
@@ -244,6 +244,27 @@ Hence, for $P \in \PROB_f(\SEQ A)$, with $P[\len \geq N] > 0$ we can define the
            \sum_{i \geq 1} \PR{i}{N}_* P \;\in\; \PROB(A^N). \]
 Note, that the special case of $N=1$ reduces to our earlier definition.
 
+\subsubsection{From $N$-gram measures to Language Models}
+\textbf{this section is work in progress}
+We have to see if a similar argument holds to construct a Language Model from and $N$-gram measure. 
+In this case we would get a map $B^N : \PROB(A^N) \lra \PROB(\SEQ)$
+
+\newcommand{\BACK}[1]{{\partial^{#1}}}
+
+\subsubsection{converting $N$-gram measures to $M$-gram measures}
+\textbf{this section is work in progress}
+We achieved by the above observations the following. 
+We can now convert any given Language Model to an $N$-gram Model via $D^N$. We can also convert any given $M$-gram Model to a Language Model via $B^M$.
+This can be seen from this Diagram:
+\[ \PROB(A^N) \overset{B^N}{\lra} \PROB(\SEQ A) \overset{D^M}{\lra} \PROB(A^M) \]
+In particular we can look at the case $M=N-1$:
+For $P \in \PROB(A^N)$ we get $D^{N-1}B^NP$ the induced back off model.
+We remark that the back off model is not well defined since $B^N$ is only defined up to a distribution from $\PROB(\IN)$.
+We still define the backoff operator as $\BACK{N}:=D^{N-1} \circ B^{N}$ in this way we get a sequence of $N$-gram models.
+\[ \dots \overset{\BACK{N+1}}{\lra} \PROB(A^{N}) \overset{\BACK{N}}{\lra} \PROB(A^{N-1}) \overset{\BACK{N-1}}{\lra} \dots \overset{\BACK{2}}{\lra} \PROB(A)  \]
+
+\textit{discuss what happens in the boundary case when applying the backoff operator to a unigram model. Also discuss if the index should have been shifted by one.}
+\textit{I am not to happy with choosing partial as a symbol. There are several reasons. 1.) it was used for skips with a subindex 2.) we might want to define something like $\partial_M^N$ for converting between models. 3.) the resulting sequence is not really a complex since applying $\partial$ twice in general will not result to the null map (also the spaces are not abelian groups as far as I understand) 3.) $\partial$ as well as $B$ don't reflect the arbitrary choice that was being made}
 \subsection{Markov measures}
 
 A probability measure $P$ on $\SEQ A$ is called $K$-Markov if
